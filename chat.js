@@ -14,6 +14,7 @@ function loadStyle(src) {
         let link = document.createElement('link');
         link.setAttribute('rel', 'stylesheet');
         link.setAttribute('href', src);
+        link.src = src;
         link.onload = () => resolve(link);
         document.head.append(link);
     });
@@ -42,6 +43,7 @@ function main() {
         "<button class='chat-send'>Send</button></div>" +
         "</div>").dialog({
         draggable: false,
+        position: { my: 'right bottom', at: 'right bottom' },
         collapseEnabled: true,
         collapse: function(event, ui) {
             localStorage["chatState"] = "collapsed";
@@ -51,8 +53,8 @@ function main() {
         }
     });
     if (localStorage["chatState"] === "collapsed")
-        $(".ui-button.ui-corner-all.ui-widget.ui-button-icon-only.ui-dialog-titlebar-collapse").click();
-    $("#chat .chat-send").click(sendMessage);
+        $(".ui-button.ui-corner-all.ui-widget.ui-button-icon-only.ui-dialog-titlebar-collapse").click(); //не знаю, как сделать по адекватному, чтобы октрывалось свернутым
+    $("#chat .chat-send").click(sendMessage);                                                           //там вроде есть метод collapse(), но я не понял у какого он объекта
     $("#chat .chat-input").keydown((e) => {
         if (e.keyCode === 13)
             sendMessage();
