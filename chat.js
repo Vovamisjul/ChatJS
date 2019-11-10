@@ -19,8 +19,29 @@ function loadStyle(src) {
     });
 }
 
+function addMessageToChat(who, message) {
+    let yourMessage = `<p> ${who}: ${message}</p>`;
+    localStorage["chatDialog"] = (localStorage["chatDialog"] || "") + yourMessage;
+    let dialog = $("#chat .chat-dialog");
+    dialog.append(yourMessage);
+    dialog.animate({scrollTop:  dialog.height()}, 1000);
+    if (who === "You")
+        setTimeout(addMessageToChat.bind(this, "Bot", `Answer on "${message.toUpperCase()}"`), 15000);
+}
+
+function sendMessage() {
+    let input = $("#chat .chat-input");
+    addMessageToChat("You", input.val())
+    input.val("");
+}
+
 function main() {
-    $("<div id='chat'></div>").dialog({
+    $("<div id='chat'>" +
+        "<div class='chat-dialog'></div>" +
+        "<div class='inputs'><input class='chat-input'>" +
+        "<button class='chat-send'>Send</button></div>" +
+        "</div>").dialog({
+        draggable: false,
         collapseEnabled: true,
         collapse: function(event, ui) {
             localStorage["chatState"] = "collapsed";
@@ -31,6 +52,14 @@ function main() {
     });
     if (localStorage["chatState"] === "collapsed")
         $(".ui-button.ui-corner-all.ui-widget.ui-button-icon-only.ui-dialog-titlebar-collapse").click();
+    $("#chat .chat-send").click(sendMessage);
+    $("#chat .chat-input").keydown((e) => {
+        if (e.keyCode === 13)
+            sendMessage();
+    });
+    let dialog = $("#chat .chat-dialog");
+    dialog.append(localStorage["chatDialog"]);
+    dialog.animate({scrollTop:  dialog.height()}, 1000);
 }
 
 loadScript("js/jquery-3.4.1.min.js")
@@ -38,4 +67,5 @@ loadScript("js/jquery-3.4.1.min.js")
     .then(() => loadScript("js/jquery.ui.dialog-collapse.js"))
     .then(() => loadStyle("style/jquery-ui.css"))
     .then(() => loadStyle("style/jquery.ui.dialog-collapse.css"))
+    .then(() => loadStyle("style/chat-style.css"))
     .then(main);
